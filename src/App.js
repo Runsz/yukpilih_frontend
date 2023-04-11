@@ -7,19 +7,22 @@ import CreatePoll from './Pages/CreatePoll';
 import Hasil from './Pages/Hasil';
 import Vote from './Pages/Vote';
 import NotFound from './Pages/NotFound';
+import { useEffect, useState } from 'react';
+import AuthProvider from './AuthContext';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/change" element={<Change/>}/>
-        <Route path="/create-poll" element={<CreatePoll/>}/>
-        <Route path="/hasil" element={<Hasil/>}/>
-        <Route path="/vote" element={<Vote/>}/>
-        <Route path="*" element={<NotFound/>}/>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/" element={<Dashboard/>}/>
+          <Route path="/change" element={<Change/>}/>
+          <Route path="/create-poll" element={<CreatePoll/>}/>
+          <Route path="/hasil/:id" element={<Hasil/>}/>
+          <Route path="/vote/:id" element={<Vote/>}/>
+        </Routes>
+      </AuthProvider>
     </Router>
   )
 }

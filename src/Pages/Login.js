@@ -1,42 +1,36 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Await, useNavigate } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import AuthProvider, { useAuth } from "../AuthContext";
 
 const Login = () => {
-    const navigate = useNavigate()
-
-    const [Username, setUsername] = useState()
-    const [Password, setPassword] = useState()
-
-    async () => {
-        await axios.post('http://localhost:8000/api/login',{
-            "username": Username,
-            "password": Password
-        })
-    }
+    const { setUsername, username, setPassword, password, Login} = useAuth()
 
     return (
-        <div class="container-xl text-center p-5">
-            <h1 class="mb-5">YukPilih</h1>
-            <form>
+        <div className="container-xl text-center p-5">
+            <h1 className="mb-5">YukPilih</h1>
+            <form onSubmit={(e) => Login(e)}>
                 <input 
                     id="username" 
-                    class="form-control mx-auto w-50" 
+                    className="form-control mx-auto w-50" 
                     placeholder="username" 
-                    type="text" 
-                    onChange={e => setUsername(e.target.value)}>
+                    type="text"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required>
                 </input><br></br>
                 <input 
                     id="password" 
-                    class="form-control mx-auto w-50" 
+                    className="form-control mx-auto w-50" 
                     placeholder="password" 
                     type="password"
-                    onChange={e => setPassword(e.target.value)}>
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required>
                 </input><br></br>
                 <button 
                     type="submit" 
-                    class="btn btn-primary w-50 mb-3 p-2"
-                    onClick={() => navigate('/change')}>
+                    className="btn btn-primary w-50 mb-3 p-2">
                         Login
                 </button>
             </form>

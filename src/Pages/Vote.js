@@ -1,47 +1,72 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { Border } from 'react-bootstrap-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 const Vote = () => {
     const navigate = useNavigate()
-    const [Click, setClick] = useState(false);
+    const {url, token} = useAuth()
+    const [Polling, setPolling] = useState({})
+    const {id} = useParams()
+    const [choiceId, setChoiceId] = useState(null)
 
-    const handleClick = () => {
-        setClick(true)
+    useEffect(() => {
+        (async (e) => {
+                const res = await axios.get(`${url}/polling/${id}?token=${token}`)
+                    .then( response => setPolling(response.data))
+        })()
+    },[])
+
+    const voting = async() => {
+        if (choiceId == null) {
+            alert("Harus memilih salah satu")
+        }else{
+            await axios.post(`${url}/polling/${id}/vote?token=${token}`,{
+                "choice_id":choiceId
+            }).then( res => {
+                alert(res.data.status)
+                navigate(`/hasil/${id}`)
+            }).catch( err => {
+                alert(err.response.data)
+                navigate(`/`)
+            })
+        }
     }
 
-    const datas = [
-        {id:1, nama:"mie ayam"},
-        {id:2, nama:"sate"},
-        {id:3, nama:"bakso"},
-    ]
-
     return (
-        <div>
-            <div className="p-4 pb-0">
-                <h4>Pilih makanan favorit</h4>
-                <p>created by : arun deadline : 30/3/2023 23:59 WIB</p>
-                <p className='mb-0'>Apa makanan Favoritmu?</p>
-            </div>
-            <div className="d-flex w-100 p-4">
-                {datas.map((data,index )=> {
-                    return (<div 
-                        id="vote" 
-                        className="bg-primary rounded text-center p-2"
-                        style={{width:"30%",margin:"0px 10px", border: Click ? '2px solid black' : ''}}
-                        onClick={handleClick}>
-                            {data.nama}
+        <div className='text-center mt-5'> 
+            {Polling.admin !=null && Polling.choices != null ? 
+                <>
+                    <div className="p-4 pb-0">
+                        <h1>{Polling.title}</h1>
+                        <p>created by : {Polling.admin.username} deadline : {Polling.deadline}</p>
+                        <h5 className='mb-0'>{Polling.description}?</h5>
+                    </div> 
+
+                    <div className=" w-100 p-5">
+                        {Polling.choices.map(p => (
+                            <div 
+                                key={p.id}
+                                id="vote" 
+                                onClick={() => setChoiceId(p.id)}
+                                className={`bg-info rounded text-center p-2 ${choiceId == p.id ? "border border-3 border-primary" : ""}`}
+                                style={{width:"30%", margin:"10px auto", color:"white"}}>
+                                    {p.choice}
+                            </div> 
+                        ))}
                     </div>
-                )})}
-            </div>
-            <div className="text-center">
-                <button 
-                    type="submit" 
-                    className="btn btn-primary mt-2"
-                    onClick={() => navigate('/hasil')}>
-                        vote
-                </button>
-            </div>
+
+                    <div className="text-center">
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary mt-2"
+                            onClick={() => voting()}>
+                                vote
+                        </button>
+                    </div>
+                </> 
+            : ""}
         </div>
     )
 }
